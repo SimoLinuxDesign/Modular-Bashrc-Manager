@@ -8,11 +8,12 @@ editor="vim"
 #################
 ### VARIABLES ###
 ################# 
-available_scripts="/home/$(whoami)/.bashrc.d/scripts-available/"
-enabled_scripts="/home/$(whoami)/.bashrc.d/scripts-enabled/"
-needed_scripts="/home/$(whoami)/.bashrc.d/scripts-needed"
-bin_folder="/home/$(whoami)/.bashrc.d/scripts-removed/"
-bashrc="/home/$(whoami)/.bashrc"
+home_folder="$HOME/"
+available_scripts="${home_folder}.bashrc.d/scripts-available/"
+enabled_scripts="${home_folder}.bashrc.d/scripts-enabled/"
+needed_scripts="${home_folder}.bashrc.d/scripts-needed"
+bin_folder="${home_folder}.bashrc.d/scripts-removed/"
+bashrc="${home_folder}.bashrc"
 
 #################
 ### FUNCTIONS ###
@@ -21,24 +22,27 @@ bashrc="/home/$(whoami)/.bashrc"
 # Refresh Bash #
 refresh-brc(){
 	if [ "$1" == "-dis" ]; then
+		echo "------------------------------------"
 		echo "[ Bashrc Refreshed ]"
 		echo "You can't use the old commands from now!"
-		echo "------------------------"
+		echo "------------------------------------"
 	elif [ "$1" == "-en" ]; then
+		echo "------------------------------------"
 		echo "[ Bashrc Refreshed ]"
+		echo "------------------------------------"
 		echo "You can you the new commands from now!"
-		echo "-----------------------"
+		echo "------------------------------------"
 	else
 		echo "[ Bashrc Refreshed ]"
 	fi
-	source $bashrc
+	source "$bashrc"
 }
 
 
 createscript() {
-	echo "-----------------------"
-	echo " Creation New Scripts: " 
-	echo "-----------------------"
+	echo "------------------------------------"
+	echo "       Creation New Scripts:        " 
+	echo "------------------------------------"
 	echo "Name of the script: "
 	read namenewscript
 	if [ -f "${available_scripts}$namenewscript" ]; then
@@ -68,15 +72,14 @@ createscript() {
 		### END NEW SCRIPT ###
 
 		vim "$newscriptav"
-
-		echo "------------------------------"
-		echo "Script $namenewscript created!"
-		echo "  Do you want to enable it?"
-		echo "------------------------------"
-		echo "   1 | yes "
-		echo "   2 | no "
-		echo " Def | no "
-		echo "------------------------------"
+		echo "------------------------------------"
+		echo "   Script $namenewscript created!"
+		echo "     Do you want to enable it?"
+		echo "------------------------------------"
+		echo "     1 | yes "
+		echo "     2 | no "
+		echo "   Def | no "
+		echo "------------------------------------"
 		read answer
 		if [ "$answer" -eq 1 ]; then
 			ln -sf "$newscriptav" "${enabled_scripts}$namenewscript.sh"
@@ -102,9 +105,9 @@ listitem() {
 
 
 managescript() {
-	echo "---------------------"
-	echo "  Select the index:  "
-      	echo "---------------------"	
+	echo "------------------------------------"
+	echo "         Select the index:          "
+	echo "------------------------------------"
     read manageindex
     index2=1  
     for i in $(ls "$available_scripts"); do
@@ -126,7 +129,7 @@ managescript() {
 		else
 			ln -sf "$available_scripts$i" "${enabled_scripts}$i"
 	                inoext=${i:0:-3}
-	                echo "-----------------------"
+					echo "------------------------------------"
 	                echo "[ Scripts $inoext Enabled ]"
 	                refresh-brc -en
 		fi
@@ -150,6 +153,52 @@ managescript() {
                         vim "$available_scripts$i"
                     fi
                 fi
+				clear
+				echo "------------------------------------"
+				echo "Would you like to rename the script?"
+				echo "------------------------------------"
+				echo " 1 | yes "
+				echo " 2 | no  "
+				echo " default | no "
+				echo "------------------------------------"
+				read renscr
+				if [ $renscr == "1" ]; then
+				clear
+					countloop=0
+					while [ $countloop -lt 1 ]; do
+						echo "------------------------------------"
+						echo "Insert new name:"
+						read  renamenow
+						echo "------------------------------------"
+						echo "Is the name correct? "
+						echo "------------------------------------"
+						echo " 1 | no "
+						echo " 0 | yes "
+						echo " default | yes "
+						echo "------------------------------------"
+						read confirm
+						if [ "$confirm" == "1" ]; then
+							countloop=0
+							clear
+							echo "------------------------------------"
+							echo "Rename again the file:"
+						else
+							wasenabled=0
+							if [ -f "$enabled_scripts$i" ]; then
+								unlink "$enabled_scripts$i"
+								echo "[ Temporary Disabled Script ]"
+								wasenabled=1
+							fi
+							mv "$available_scripts$i" "${available_scripts}$renamenow.sh"
+							echo "[ Script $i renamed to $renamenow.sh ]"
+							if [ "$wasenabled" -eq 1 ]; then
+								ln -sf "${available_scripts}$renamenow.sh" "${enabled_scripts}$renamenow.sh"
+								echo "[ Script Enabled Again ]"
+							fi
+							countloop=1
+						fi 
+					done
+				fi	
                 refresh-brc -en
 	    # REMOVE SCRIPT #
 	    elif [ "$1" == "--remove" ]; then 
@@ -160,11 +209,12 @@ managescript() {
 			unlink "${enabled_scripts}$i"
 			echo "[ Script $i unabled! ]"
 		fi
-		mv "${available_scripts}$i" $bin_folder
+		removed_data="$i-`date +%F`_`date +%T`"
+		mv "${available_scripts}$i" "${bin_folder}$removed_data"
 		echo "[ Script $i removed! ]         "
 		echo "You can find it in the folder: "
 		echo "'$bin_folder' "
-		echo "--------------------------------"
+		echo "------------------------------------"
 		refresh-brc	
             fi
 	    
@@ -175,17 +225,17 @@ managescript() {
 }
 
 removescript(){
-	echo "-----------------------"
-	echo "     Remove Script     "
-	echo "-----------------------"
+	echo "------------------------------------"
+	echo "           Remove Script            "
+	echo "------------------------------------"
 	listitem
 	managescript --remove
 }	
 
 enablescript() {
-	echo "-----------------------"
-	echo "     Enable Scripts    "
-	echo "-----------------------"
+	echo "------------------------------------"
+	echo "           Enable Scripts           "
+	echo "------------------------------------"
 	listitem
 	managescript --enable
 }
@@ -196,16 +246,16 @@ enableallscript() {
                 inoext=${i:0:-3}
                 echo "enabled $inoext"
 	done
-	echo "-----------------------"
+	echo "------------------------------------"
 	echo "[ All available scripts enabled ]"
 	refresh-brc -en
 }
 
 
 disablescript() {
-	echo "-----------------------"
-	echo "    Disable Scripts    "
-	echo "-----------------------"
+	echo "------------------------------------"
+	echo "          Disable Scripts           "
+	echo "------------------------------------"
 	listitem
 	managescript --disable
 }
@@ -218,7 +268,7 @@ disableallscript() {
 		inoext=${i:0:-3}
 		echo "disabled $inoext"
 	done
-	echo "------------------------"
+	echo "------------------------------------"
 	echo "[ All Scripts Disabled ]"
 	refresh-brc -dis
 }
@@ -247,23 +297,19 @@ brc-script() {
 
 	### SCRIPTS LIST ###
 	elif [ "$1" == "-l" ]; then
-        	echo "-----------------------------"
-	        echo "         Scripts List        "
-	        echo "-----------------------------"
+			echo "------------------------------------"
+	        echo "            Scripts List            "
+			echo "------------------------------------"
 		listitem
-		echo "-----------------------------"
-		echo " The script preceded by the" 
-		echo "   '-' character is active.  "
-		echo "-----------------------------"
+		echo "------------------------------------"
+		echo "    The script preceded by the" 
+		echo "      '-' character is active.  "
+		echo "------------------------------------"
 	
 	### MODIFY SCRIPTS ###
 	elif [ "$1" == "-m" ]; then
 		echo "###### MODIFY SCRIPTS #######"
 		listitem
-		echo "-----------------------------"
-		echo " Type the name of the script "
-		echo "     you need to modify:     "
-		echo "-----------------------------"
 		managescript --modify
 		
 	### CREATE NEW SCRIPT ###
@@ -276,7 +322,7 @@ brc-script() {
 
 	### COMMAND LISTS ###
 	else
-		echo "-----------------------------"
+			echo "-----------------------------"
         	echo " List of brc-scripts command "
 	        echo "-----------------------------"
 		echo "  -c  | Create New Script    "
