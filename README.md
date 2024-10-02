@@ -95,9 +95,9 @@ The `brc-script.sh` script provides a series of commands to manage your .bashrc 
 - `-c` : Create a new script in the `scripts-available/` folder.
 - `-m` : Modify an existing script.
 - `-l` : List all available and enabled scripts.
-- `-e <index>` : Enable a script from the `scripts-available/` folder.
-- `-d <index>` : Disable an enabled script.
-- `-r <index>` : Remove a script, backing it up in `scripts-removed/`.
+- `-e` : Enable a script from the `scripts-available/` folder.
+- `-d` : Disable an enabled script.
+- `-r` : Remove a script, backing it up in `scripts-removed/`.
 
 ### Example Commands
 
