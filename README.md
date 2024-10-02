@@ -1,5 +1,5 @@
 # Modular Bashrc Manager
-A simple, modular, and clean way to manage your .bashrc file in Linux.
+### A simple, modular, and clean way to manage your .bashrc file in Linux.
 
 This project provides a modular system for managing Bash scripts within the .bashrc environment. It allows users to easily enable, disable, create, and manage custom scripts through a well-structured directory layout, making the .bashrc configuration cleaner and easier to maintain.
 
