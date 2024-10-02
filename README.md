@@ -113,17 +113,17 @@ The `brc-script.sh` script provides a series of commands to manage your .bashrc 
 
 - Enable a script:
     ```bash
-    brc-script -e <index>
+    brc-script -e
     ```
 
 - Disable a script:
     ```bash
-    brc-script -d <index>
+    brc-script -d
     ```
 
 - Remove a script:
     ```bash
-    brc-script -r <index>
+    brc-script -r
     ```
 
 ## Why Use This System?
