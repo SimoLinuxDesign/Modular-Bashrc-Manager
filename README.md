@@ -19,7 +19,6 @@ After installation, the system uses the following directory layout to manage scr
 - `~/.bashrc.d/`: Main directory for managing Bash scripts.
   - `installer/`: Contains the installer and base script.
     - `brc-script-install.sh`
-    - `brc-script.sh`
   - `scripts-available/`: Scripts available to be enabled.
   - `scripts-enabled/`: Symbolic links to enabled scripts.
   - `scripts-needed/`: Essential scripts required for the system to work.
