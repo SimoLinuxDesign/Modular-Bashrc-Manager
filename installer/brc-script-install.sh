@@ -1,5 +1,101 @@
 #!/bin/bash
-home="/home/$(whoami)"
+clear
+user=$(whoami)  # Remove the extra space
+
+follow() {
+    read -p "Press 'Enter' to continue"
+}
+
+loop2=0
+while [ $loop2 -lt 1 ]; do  # Corrected the integer comparison
+    echo "### brc-script installer ###"
+    echo "---------------------------------------------"
+    echo "Do you want to install for the current user ($user)?"
+    echo "---------------------------------------------"
+    echo " y - yes"
+    echo " n - no"
+    echo " q - exit" 
+    echo " default - yes"
+    echo "---------------------------------------------"
+    read choice
+    if [ "$choice" == "n" ]; then
+        loop2=1
+        loop1=0
+        clear
+        while [ $loop1 -lt 1 ]; do  # Corrected the integer comparison
+            echo "----------------------------"
+            echo "List of the available users:"
+            echo "----------------------------"
+            for i in $(grep -E ':/home/' /etc/passwd | cut -d: -f1); do echo $i; done 
+            echo "q = exit"
+            echo "----------------------------"
+            echo "Type the user:"
+            read choice2
+            if [ -d "/home/$choice2" ]; then
+                user=$choice2
+                echo "Selected user '$choice2'!"
+                echo "-------------------"
+                echo "Can you confirm it?"
+                echo "-------------------"
+                echo " y = yes "
+                echo " n = no "
+                echo " default = no "
+                echo "-------------------"
+                read confirm  # Changed 'input' to 'read'
+                if [ "$confirm" == "y" ]; then
+                    user=$choice2
+                    echo "Using user '$choice2'"
+                    loop1=1
+                else
+                    echo "Wrong selection, for user '$choice2' "
+                    follow
+                    loop1=0
+                fi
+            elif [ "$choice2" == "q" ]; then
+                echo "Exit from the installer script"
+                exit 1
+            else
+                echo "Home folder for '$choice2' does not exist!"
+                echo "Try with another one!"
+            fi
+        done
+	elif [ "$choice" == "q" ]; then
+		echo "[ Exit from the installer script! ]"
+		exit 1
+    else
+        clear
+        loop3=0
+        while [ $loop3 -eq 0 ]; do
+            echo "--------------------------------"
+            echo "Do you want to use '$user' user?"
+            echo "--------------------------------"
+            echo " y = yes"
+            echo " n = no "
+            echo "--------------------------------"
+            read choice3
+            if [ "$choice3" == "y" ]; then
+                echo "Selected the current user '$user'"
+                loop2=1
+                loop3=1
+                follow
+            elif [ "$choice3" == "n" ]; then  # Corrected from 'no' to 'n'
+                echo "Not selected the current user '$user'"
+                loop3=1
+                follow
+				clear
+            else
+                echo "Pressed wrong button!"
+                follow
+				clear
+		clear
+            fi
+        done
+    fi
+done
+
+#### NEEDED VARIABLES ####
+location="$(pwd)/../"
+home="/home/$user"
 bashrc="$home/.bashrc"
 mainfolder="$home/.bashrc.d/"
 neededfold="${mainfolder}scripts-needed"
@@ -7,75 +103,34 @@ avfolder="${mainfolder}scripts-available"
 enfolder="${mainfolder}scripts-enabled"
 rmfolder="${mainfolder}scripts-removed"
 
-## FUNCTIONS ##
-createdir(){
-	if [ ! -d "$mainfolder" ]; then 
-		mkdir $mainfolder
-		echo "[ Created $mainfolder ]"
-	fi
-
-    if [ ! -d "$neededfold" ]; then 
-        mkdir $neededfold
-        echo "[ Created $neededfold ]"
-    fi
-
-    if [ ! -d "$avfolder" ]; then 
-        mkdir $avfolder
-        echo "[ Created $avfolder ]"
-    fi
-
-    if [ ! -d "$enfolder" ]; then 
-        mkdir $enfolder
-        echo "[ Created $enfolder ]"
-    fi
-
-    if [ ! -d "$rmfolder" ]; then 
-        mkdir $rmfolder
-        echo "[ Created $rmfolder ]"
-    fi
-}
-
-modular-bashrc(){
-echo 'mkdir -p ~/.bashrc.d/scripts-needed' >> $bashrc
-echo 'mkdir -p ~/.bashrc.d/scripts-enabled' >> $bashrc
-echo 'mkdir -p ~/.bashrc.d/scripts-available' >> $bashrc
-echo 'if [ -d ~/.bashrc.d ]; then' >> $bashrc
-echo '    for needed in ~/.bashrc.d/scripts-needed/*.sh; do' >> $bashrc
-echo '        [ -r "$needed" ] && source "$needed"' >> $bashrc
-echo '    done' >> $bashrc                                                                                                                                                                    
-echo '    unset needed' >> $bashrc
-echo '    for file in ~/.bashrc.d/scripts-enabled/*.sh; do' >> $bashrc
-echo '        [ -r "$file" ] && source "$file"' >> $bashrc
-echo '    done' >> $bashrc
-echo '    unset file' >> $bashrc
-echo 'fi' >> $bashrc 
-}
-
-copy-brc() {
-	cp -r brc-script.sh ../scripts-needed/
-	chmod 750 -R ../scripts-needed/brc-script.sh
-}
-
+#### INSTALLATION #### 
+cp "$bashrc"  "bashrc-backup-`date +%F`"
+echo "[ Created a backup ]"
+cat NEEDED-FOR-INSTALLER >> $bashrc
+echo "[ Added info in the .bashrc file ]"
+cp -r $location $mainfolder
+echo "[ Installed Main Folder ]"
+echo $mainfolder
+source $bashrc
+echo "[ Refreshed bashrc ]"
+echo ""
+echo "Intallation Completed!"
+follow
+clear
 ## EXECUTION ##
-echo "### Creation Folders ###"
-createdir
-echo "### Adding brc-script for .bashrc ###"
-modular-bashrc
-echo [ brc-script installed ]
-
 echo "##################################"
 echo "        Small Introduction        "
 echo "##################################"
 echo "" 
-echo "You can handle you script by adding in the $avfolder."
-echo "Make sure that all the the script that you are adding are added in a function, otherwise their will be loaded at each open of the bash cli."
-echo "You can start to handle all the script by writing the command brc-script, also you can refresh the bash with the command refresh-brc."
-echo "You can start to create your own script by use the 'brc-script -c' command"
-echo "To enable an available script (after you copied or created one in the scripts-available) by using 'brc-script -e' and the the index command that you need"
-echo "You can also modify the existing script by the 'brc-script -m' command."
+echo "You can handle your script by adding them in the $avfolder."
+echo "Make sure that all the scripts you add are within a function, otherwise they will be loaded each time you open the bash CLI."
+echo "You can start managing scripts by using the command 'brc-script', and refresh bash with 'refresh-brc'."
+echo "You can create your own script using 'brc-script -c'."
+echo "To enable an available script (after copying or creating one in the scripts-available), use 'brc-script -e' and provide the index."
+echo "You can also modify existing scripts using 'brc-script -m'."
 echo ""
 echo "##################################"
 echo "   Thanks for using this script.  "
 echo "##################################"
-echo " Visit my website www.simolinuxdesign.org to discover more plugin that i created!
+echo "Visit my website www.simolinuxdesign.org to discover more plugins I created!"
 
