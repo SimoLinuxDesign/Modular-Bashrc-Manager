@@ -72,6 +72,21 @@ createscript() {
 		### END NEW SCRIPT ###
 
 		vim "$newscriptav"
+		if [ $? -ne 0 ]; then
+			echo "------------------------------------"
+			echo "         Editor aborted!"
+	       		echo " Continue or remove $namenewscript?"
+			echo "------------------------------------"
+			echo "     1 | Continue "
+			echo "     2 | Abort "
+			echo "   Def | Continue "
+			echo "------------------------------------"
+			read answer
+			if [ "${answer}x" = "2x" ]; then
+				rm "$newscriptav"
+				return
+			fi
+		fi
 		echo "------------------------------------"
 		echo "   Script $namenewscript created!"
 		echo "     Do you want to enable it?"
@@ -95,11 +110,11 @@ listitem() {
    	for i in $(ls "$available_scripts"); do
         	inotext=${i:0:-3}
 		(( index ++ ))
+		enabled=""
    		if [ -f "$enabled_scripts$i" ]; then 
-            		echo "$index) - $inotext"
-   		else
-			echo "$index) $inotext"
+			enabled="-"
    		fi
+		printf "%5d | %1s %s\n" "$index" "$enabled" "$inotext"
 	done
 }
 
