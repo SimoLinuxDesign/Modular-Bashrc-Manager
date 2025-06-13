@@ -1,5 +1,6 @@
 # Modular Bashrc Manager
-A simple, modular, and clean way to manage your .bashrc file in Linux.
+### A simple, modular, and clean way to manage your .bashrc file in Linux.
+---
 
 This project provides a modular system for managing Bash scripts within the .bashrc environment. It allows users to easily enable, disable, create, and manage custom scripts through a well-structured directory layout, making the .bashrc configuration cleaner and easier to maintain.
 
@@ -10,6 +11,7 @@ This project provides a modular system for managing Bash scripts within the .bas
 - **Automatic Directory Structure**: The installer automatically creates directories for managing available, enabled, removed, and required scripts.
 - **Customizable Script Templates**: When creating a new script, a template with placeholders for options, variables, functions, and execution logic is provided.
 - **Easy Integration**: Automatically integrate with your existing .bashrc setup.
+- **Colorful Echo (`ccecho`)**: Print colored and styled messages for better terminal output, ( usable even outside of the brc-script environment )
 
 ## Directory Structure
 
@@ -18,18 +20,16 @@ After installation, the system uses the following directory layout to manage scr
 - `~/.bashrc.d/`: Main directory for managing Bash scripts.
   - `installer/`: Contains the installer and base script.
     - `brc-script-install.sh`
-    - `brc-script.sh`
   - `scripts-available/`: Scripts available to be enabled.
   - `scripts-enabled/`: Symbolic links to enabled scripts.
   - `scripts-needed/`: Essential scripts required for the system to work.
     - `brc-script.sh`
+    - `ccecho.sh`
   - `scripts-removed/`: Backup of removed scripts, timestamped.
 
 ## Installation
 
 ### Automated Installation
-
-To install the system automatically, follow these steps:
 
 1. Clone the repository:
     ```bash
@@ -46,20 +46,19 @@ To install the system automatically, follow these steps:
 The installer will:
 - Create the necessary directory structure: `scripts-needed`, `scripts-enabled`, `scripts-available`, and `scripts-removed`.
 - Append the required configuration to your .bashrc file.
-- Copy the main `brc-script.sh` script to `scripts-needed/`.
+- Copy the main `brc-script.sh` script and `ccecho.sh` to `scripts-needed/`.
 
-After the installation completes, restart your shell or reload the .bashrc file by running:
+Reload the `.bashrc` file by running:
 ```bash
 source ~/.bashrc
-```  
+```
+
 ### Manual Installation
 
-If you prefer a manual installation process, follow these steps:
-
-1. Copy the `brc-script.sh` file to the `~/.bashrc.d/scripts-needed/` folder:
+1. Copy the `brc-script.sh` and `ccecho.sh` files to the `~/.bashrc.d/scripts-needed/` folder:
     ```bash
-    cp brc-script.sh ~/.bashrc.d/scripts-needed/
-    chmod 750 ~/.bashrc.d/scripts-needed/brc-script.sh
+    cp brc-script.sh ccecho.sh ~/.bashrc.d/scripts-needed/
+    chmod 750 ~/.bashrc.d/scripts-needed/brc-script.sh ~/.bashrc.d/scripts-needed/ccecho.sh
     ```
 
 2. Append the following lines to your `.bashrc` file:
@@ -82,7 +81,7 @@ If you prefer a manual installation process, follow these steps:
     mkdir -p ~/.bashrc.d/scripts-needed ~/.bashrc.d/scripts-enabled ~/.bashrc.d/scripts-available ~/.bashrc.d/scripts-removed
     ```
 
-4. Restart your shell or source `.bashrc`:
+4. Reload `.bashrc`:
     ```bash
     source ~/.bashrc
     ```
@@ -94,9 +93,9 @@ The `brc-script.sh` script provides a series of commands to manage your .bashrc 
 - `-c` : Create a new script in the `scripts-available/` folder.
 - `-m` : Modify an existing script.
 - `-l` : List all available and enabled scripts.
-- `-e <index>` : Enable a script from the `scripts-available/` folder.
-- `-d <index>` : Disable an enabled script.
-- `-r <index>` : Remove a script, backing it up in `scripts-removed/`.
+- `-e` : Enable a script from the `scripts-available/` folder.
+- `-d` : Disable an enabled script.
+- `-r` : Remove a script, backing it up in `scripts-removed/`.
 
 ### Example Commands
 
@@ -112,18 +111,49 @@ The `brc-script.sh` script provides a series of commands to manage your .bashrc 
 
 - Enable a script:
     ```bash
-    brc-script -e <index>
+    brc-script -e
     ```
 
 - Disable a script:
     ```bash
-    brc-script -d <index>
+    brc-script -d
     ```
 
 - Remove a script:
     ```bash
-    brc-script -r <index>
+    brc-script -r
     ```
+
+## Extra Utilities
+
+### `ccecho`: Colorful Echo for Enhanced Output
+
+The project includes a utility script `ccecho.sh` located in `scripts-needed/`, which defines a function `ccecho`. This command allows you to print styled and colored messages to the terminal.
+
+#### Usage
+
+```bash
+ccecho -t green -b black -s bold "Success!"
+ccecho -t red -s underline "Error!"
+ccecho "Normal message without styling"
+```
+
+#### Available Text Colors
+`black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `bblack`, `bred`, `bgreen`, `byellow`, `bblue`, `bmagenta`, `bcyan`, `bwhite`
+
+#### Background Colors
+Same as above, applied with `-b`
+
+#### Styles
+`bold`, `dim`, `italic`, `underline`, `blink`, `reverse`, `hidden`, `strike`
+
+#### Make `ccecho` Globally Available
+
+If you'd like to use `ccecho` in other terminal sessions or scripts, you can source it in your `.bashrc`:
+
+```bash
+source ~/.bashrc.d/scripts-needed/ccecho.sh
+```
 
 ## Why Use This System?
 
