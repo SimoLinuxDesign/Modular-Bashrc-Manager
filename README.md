@@ -33,7 +33,7 @@ After installation, the system uses the following directory layout to manage scr
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/modular-bashrc-manager.git
+    git clone https://github.com/SimoLinuxDesign/Modular-Bashrc-Manager.git
     cd modular-bashrc-manager/installer
     ```
 
